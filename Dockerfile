@@ -230,6 +230,17 @@ RUN \
     --disable-shared && \
   make -j$(nproc) && make install
 
+ARG LIBASS_VERSION=libunibreak_6_1
+ARG LIBASS_URL="https://github.com/adah1972/libunibreak/releases/download/libunibreak_6_1/libunibreak-6.1.tar.gz"
+ARG LIBASS_SHA256=cc4de0099cf7ff05005ceabff4afed4c582a736abc38033e70fdac86335ce93f
+RUN \
+  wget $WGET_OPTS -O libunibreak.tar.gz "$LIBASS_URL" && \
+  echo "$LIBASS_SHA256  libunibreak.tar.gz" | sha256sum -c - && \
+  tar $TAR_OPTS libunibreak.tar.gz && cd libunibreak-* && \
+  ./configure \
+    --disable-shared \
+    --enable-static && make -j$(nproc) && make install
+
 # bump: libass /LIBASS_VERSION=([\d.]+)/ https://github.com/libass/libass.git|*
 # bump: libass after ./hashupdate Dockerfile LIBASS $LATEST
 # bump: libass link "Release notes" https://github.com/libass/libass/releases/tag/$LATEST
@@ -242,7 +253,9 @@ RUN \
   tar $TAR_OPTS libass.tar.gz && cd libass-* && \
   ./configure \
     --disable-shared \
-    --enable-static && \
+    --enable-static \
+    --enable-harfbuzz \
+    --with-libunibreak && \
   make -j$(nproc) && make install
 
 # bump: libbluray /LIBBLURAY_VERSION=([\d.]+)/ https://code.videolan.org/videolan/libbluray.git|*
